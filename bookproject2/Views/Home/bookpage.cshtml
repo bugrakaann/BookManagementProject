@@ -1,0 +1,291 @@
+@model bookproject2.Models.BookPageElements
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+
+<title>Book Portfolio Project</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+    	body{
+    margin-top:20px;
+    background:#f8f8f8
+}
+    </style>
+</head>
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container">
+<div class="row flex-lg-nowrap">
+<div class="col-12 col-lg-auto mb-3" style="width: 20px;">
+
+</div>
+<div class="col">
+<div class="e-tabs mb-3 px-3">
+<ul class="nav nav-tabs">
+<li class="nav-item"><a class="nav-link active" href="#">Books</a></li>
+</ul>
+</div>
+<div class="row flex-lg-nowrap">
+<div class="col mb-3">
+<div class="e-panel card">
+<div class="card-body">
+<div class="card-title">
+<h6 class="mr-2"><span>Books</span><small class="px-1">You can view and edit books</small></h6>
+</div>
+<div class="e-table">
+<div class="table-responsive table-lg mt-3">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Photo</th>
+<th class="max-width">Name</th>
+    <th class="sortable">Author</th>
+    <th class="sortable">IsInStock</th>
+    <th class="sortable">VolumeNumber</th>
+    <th>Actions</th>
+</tr>
+</thead>
+<tbody>
+
+@foreach (var book in Model.Books)
+    {
+        <tr>
+            <td class="align-middle text-center">
+                <div class="bg-light d-inline-flex justify-content-center align-items-center align-top" style="width: 35px; height: 35px; border-radius: 3px;"><i class="fa fa-fw fa-photo" style="opacity: 0.8;"></i></div>
+            </td>
+            <td class="text-nowrap align-middle">@book.Name</td>
+            <td class="text-nowrap align-middle"><span>@book.Author</span></td>
+            <td class="text-center align-middle"><i class="fa fa-fw text-secondary cursor-pointer fa-toggle-@(book.isInStock ? "on" : "off")"></i></td>
+            <td class="text-nowrap align-middle"><span>@book.VolumeNumber</span></td>
+            <td class="text-center align-middle">
+                <div class="btn-group align-top">
+                    <button class="btn btn-sm btn-outline-secondary badge" type="button" data-toggle="modal" data-target="#user-form-modal" onclick="editBook('@book._id')">Edit</button>
+                    <button class="btn btn-sm btn-outline-secondary badge" type="button" onclick="deleteBook('@book._id')"><i class="fa fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>
+    }
+
+</tbody>
+</table>
+</div>
+<div class="d-flex justify-content-center">
+    <ul class="pagination mt-3 mb-0">
+        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+            <a class="page-link" href="@Url.Action("BookPage", "Home", new { pageNumber = Model.PageNumber - 1 })">Previous</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="@Url.Action("BookPage", "Home", new { pageNumber = Model.PageNumber + 1 })">Next</a>
+        </li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-12 col-lg-3 mb-3">
+<div class="card">
+<div class="card-body">
+<div class="text-center px-xl-3">
+<button class="btn btn-success btn-block" type="button" data-toggle="modal" data-target="#user-form-modal" onclick="createBook()">New Book</button>
+</div>
+<hr class="my-3">
+<div class="e-navlist e-navlist--active-bold">
+<ul class="nav">
+<li class="nav-item active"><a href class="nav-link"><span>All</span>&nbsp;<small>/&nbsp;32</small></a></li>
+<li class="nav-item"><a href class="nav-link"><span>In-Stock</span>&nbsp;<small>/&nbsp;16</small></a></li>
+<li class="nav-item"><a href class="nav-link"><span>Out Of Stock</span>&nbsp;<small>/&nbsp;0</small></a></li>
+</ul>
+</div>
+<hr class="my-3">
+<div>
+<div class="form-group">
+<label>Date from - to:</label>
+<div>
+<input id="dates-range" class="form-control flatpickr-input" placeholder="01 Dec 17 - 27 Jan 18" type="text" readonly="readonly">
+</div>
+</div>
+<div class="form-group">
+<label>Search by Name:</label>
+<div><input class="form-control w-100" type="text" placeholder="Name" value></div>
+</div>
+</div>
+<hr class="my-3">
+<div class>
+<label>Status:</label>
+<div class="px-2">
+<div class="custom-control custom-radio">
+<input type="radio" class="custom-control-input" name="user-status" id="users-status-disabled">
+<label class="custom-control-label" for="users-status-disabled">Disabled</label>
+</div>
+</div>
+<div class="px-2">
+<div class="custom-control custom-radio">
+<input type="radio" class="custom-control-input" name="user-status" id="users-status-active">
+<label class="custom-control-label" for="users-status-active">Active</label>
+</div>
+</div>
+<div class="px-2">
+<div class="custom-control custom-radio">
+<input type="radio" class="custom-control-input" name="user-status" id="users-status-any" checked>
+<label class="custom-control-label" for="users-status-any">Any</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" role="dialog" tabindex="-1" id="user-form-modal">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Create Book</h5>
+<button type="button" class="close" data-dismiss="modal">
+<span aria-hidden="true">×</span>
+</button>
+</div>
+<div class="modal-body">
+<div class="py-1">
+<form class="form" novalidate>
+<input type="hidden" name="_id">       
+<div class="row">
+<div class="col">
+<div class="row">
+<div class="col">
+<div class="form-group">
+<label>Book Name</label>
+<input class="form-control" type="text" name="name" placeholder="Book Name" value="Book Name">
+</div>
+</div>
+<div class="col">
+<div class="form-group">
+<label>Author</label>
+<input class="form-control" type="text" name="author" placeholder="Author Name" value="Author Name">
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col">
+<div class="form-group">
+<label>Volume Number</label>
+<input class="form-control" type="text" name ="volumeNumber" placeholder="111111111111111">
+</div>
+</div>
+</div>
+<div class="form-group">
+    <label for="isInStock">Is in Stock:</label>
+    <input type="checkbox" id="isInStock" name="isInStock">
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col d-flex justify-content-end">
+<button class="btn btn-primary" type="submit">Save Changes</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+	async function editBook(_id) {
+        console.log("Fetching book with ID:" + _id);
+        // Fetch book data from the server
+        const response = await fetch(`/Database/GetBook/${_id}`);
+        const book = await response.json();
+        console.log("Fetched book" + book);
+        // Fill the form with the book data
+        document.querySelector('input[name="name"]').value = book.name;
+        document.querySelector('input[name="author"]').value = book.author;
+        document.querySelector('input[name="volumeNumber"]').value = book.volumeNumber;
+        document.querySelector('input[name="isInStock"]').checked = book.isInStock;
+        document.querySelector('input[name="_id"]').value = book._id;
+        console.log(book._id + "book id");
+        // Show the modal
+        $('#user-form-modal').modal('show');
+    
+        var form = document.querySelector('.form');
+        if (!form.hasAttribute('data-event-bound')) {
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                // Gather form data
+                let formData = new FormData(event.target);
+                formData.append('isInStock', document.querySelector('input[name="isInStock"]').checked);
+                // Send AJAX request to the server
+                await fetch('/Database/UpdateBookFromForm', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        // If the book was successfully updated, reload the page
+                        location.reload();
+                    } else {
+                        alert('Failed to update the book');
+                    }
+                });
+            });
+            form.setAttribute('data-event-bound', 'true');
+        }
+    }
+    function deleteBook(bookId) {
+        // Send DELETE request to the server
+        fetch(`/Database/DeleteBook/${bookId}`, {
+            method: 'DELETE'
+        }).then(response => {
+            if (response.ok) {
+                // If the book was successfully deleted, reload the page
+                location.reload();
+            } else {
+                alert('Failed to delete the book');
+            }
+        });
+    }
+    function createBook() {
+        // Clear the form fields
+        document.querySelector('input[name="name"]').value = '';
+        document.querySelector('input[name="author"]').value = '';
+        document.querySelector('input[name="volumeNumber"]').value = '';
+        document.querySelector('input[name="isInStock"]').checked = false;
+        document.querySelector('input[name="_id"]').value = '';
+    
+        // Show the modal
+        $('#user-form-modal').modal('show');
+    
+        var form = document.querySelector('.form');
+        if (!form.hasAttribute('data-event-bound')) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                // Gather form data
+                let formData = new FormData(event.target);
+                formData.append('isInStock', document.querySelector('input[name="isInStock"]').checked);
+                // Send AJAX request to the server
+                fetch('/Database/CreateBook', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        // If the book was successfully created, reload the page
+                        location.reload();
+                    } else {
+                        alert('Failed to create the book');
+                    }
+                });
+            });
+            form.setAttribute('data-event-bound', 'true');
+        }
+    }
+</script>
+</body>
+</html>
